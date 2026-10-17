@@ -1,0 +1,28 @@
+name: Community checks
+on:
+  push:
+    branches: [master, native-panel]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/purge-panel/package-lock.json
+      - run: npm --prefix packages/purge-panel ci --ignore-scripts --legacy-peer-deps
+      - run: npm run check:docs
+      - run: npm test
+      - run: npm run check:client
+      - run: npm pack --ignore-scripts && node scripts/smoke.mjs
+      - run: npm run test:ui
+      - run: npm --prefix packages/purge-panel run format:check
+      - run: npm --prefix packages/purge-panel test
+      - run: node --check lib/index.js && node --check lib/core.js && node --check lib/reapply.js && node --input-type=module -e "import './lib/index.js'"
+      - run: npm pack --ignore-scripts

@@ -1,0 +1,272 @@
+.dshpp-native.dshpp-root {
+  --dshpp-display: inherit;
+  --dshpp-sans: inherit;
+  --dshpp-paper: var(--dsw-alias-bg-base, transparent);
+  --dshpp-bg: transparent;
+  --dshpp-line: var(--dsw-alias-border-l1, #ddd);
+  --dshpp-ink: var(--dsw-alias-label-primary, #171717);
+  --dshpp-mute: var(--dsw-alias-label-secondary, #777);
+  --dshpp-accent: var(--dsw-alias-brand-primary, #4775ed);
+  --dshpp-fill: var(--dsw-alias-interactive-bg-hover, #f3f3f3);
+  font: inherit;
+  font-size: var(--dsh-content-font-size, 14px);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  padding: 0;
+  gap: 0;
+  border-radius: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.dshpp-native * {
+  box-sizing: border-box;
+}
+.dshpp-native [hidden] {
+  display: none !important;
+}
+.dshpp-native-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+  gap: 12px;
+  flex: none;
+}
+.dshpp-native-head h2 {
+  font: inherit;
+  font-size: 1.15em;
+  font-weight: 600;
+  margin: 0;
+}
+.dshpp-native-head p {
+  margin: 4px 0 0;
+  font-size: 0.85em;
+  color: var(--dshpp-mute);
+}
+.dshpp-native-badge {
+  font-size: 0.8em;
+  color: var(--dshpp-mute);
+}
+.dshpp-native-nav {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--dshpp-line);
+  flex: none;
+  overflow-x: auto;
+}
+.dshpp-native-nav button {
+  font: inherit;
+  font-size: 0.92em;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--dshpp-mute);
+  padding: 10px 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.dshpp-native-nav button[aria-pressed="true"] {
+  color: var(--dshpp-ink);
+  border-bottom-color: var(--dshpp-accent);
+}
+.dshpp-native-content {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+.dshpp-native .dshpp-panel {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  min-width: 0;
+}
+.dshpp-native
+  :is(
+    h3,
+    h4,
+    .dshpp-title,
+    .dshpp-group-h strong,
+    .dshpp-metric b,
+    .dshpp-now-ver,
+    .dshpp-edition-name
+  ) {
+  font-family: inherit;
+  font-size: 1em;
+  letter-spacing: normal;
+  font-weight: 550;
+}
+.dshpp-native .dshpp-metric b {
+  font-size: 1.12em;
+}
+.dshpp-native .dshpp-head {
+  margin-bottom: 12px;
+}
+.dshpp-native .dshpp-sub {
+  margin-top: 0;
+  flex-wrap: wrap;
+}
+.dshpp-native :is(button, input, select, textarea) {
+  font-family: inherit;
+  box-shadow: none;
+  background-image: none;
+  max-width: 100%;
+}
+.dshpp-native .dshpp-btn {
+  font-size: 0.9em;
+  min-height: 32px;
+  border-radius: 7px;
+  padding: 6px 10px;
+  transform: none;
+  box-shadow: none;
+}
+.dshpp-native .dshpp-btn:hover:not(:disabled) {
+  background: var(--dshpp-fill);
+  box-shadow: none;
+  transform: none;
+}
+.dshpp-native .dshpp-btn-primary {
+  background: var(--dsw-alias-label-primary, #171717);
+  color: var(--dsw-alias-bg-base, #fff);
+  border-color: transparent;
+}
+.dshpp-native .dshpp-btn-primary:hover:not(:disabled) {
+  opacity: 0.85;
+  background: var(--dsw-alias-label-primary, #171717);
+}
+.dshpp-native :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--dshpp-accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+.dshpp-native .dshpp-area {
+  font-family: inherit;
+  font-size: 0.92em;
+  line-height: 1.6;
+  min-height: 260px;
+  width: 100%;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+}
+.dshpp-native .dshpp-field {
+  font-size: 0.92em;
+  background: transparent;
+  color: inherit;
+}
+.dshpp-native .dshpp-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.dshpp-native .dshpp-metric:nth-child(2) {
+  display: none;
+}
+.dshpp-native .dshpp-metric {
+  min-height: 60px;
+  padding: 12px;
+  background: var(--dshpp-fill);
+  border: 0;
+}
+.dshpp-native .dshpp-metric span {
+  font-size: 0.85em;
+}
+.dshpp-native .dshpp-editions {
+  margin: 10px 0;
+  border: 0;
+}
+.dshpp-native summary {
+  cursor: pointer;
+  color: var(--dshpp-mute);
+  padding: 8px 0;
+  font-size: 0.9em;
+}
+.dshpp-native .dshpp-edition {
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.dshpp-native .dshpp-edition-name {
+  grid-column: 1/-1;
+}
+.dshpp-native .dshpp-edition .dshpp-btn {
+  min-width: 0;
+}
+.dshpp-native .dshpp-table {
+  table-layout: fixed;
+  font-size: 0.83em;
+}
+.dshpp-native .dshpp-table td {
+  word-break: break-word;
+  padding: 8px;
+}
+.dshpp-native .dshpp-table th {
+  padding: 8px;
+}
+.dshpp-native .dshpp-group-h {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dshpp-native .dshpp-group-h em {
+  font-size: 0.85em;
+}
+.dshpp-native .dshpp-row {
+  gap: 8px;
+}
+.dshpp-native .dshpp-hint {
+  font-size: 0.85em !important;
+  line-height: 1.6;
+  color: var(--dshpp-mute);
+}
+.dshpp-native .dshpp-more {
+  border-top: 1px solid var(--dshpp-line);
+  padding-top: 20px;
+  margin-top: 24px;
+}
+.dshpp-native .dshpp-more p {
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: var(--dshpp-mute);
+}
+.dshpp-native .dshpp-attribution {
+  margin-top: 32px;
+  font-size: 0.78em !important;
+}
+
+/* 演练台：旧版跑在可拖拽悬浮窗里，现在嵌在右侧栏，必须自己撑开并允许滚动 */
+.dshpp-native-drill {
+  width: 100%;
+  min-width: 0;
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 24px;
+  box-sizing: border-box;
+}
+.dshpp-native-drill > .rt-dock.rt-embedded {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* 右侧栏很窄：内部所有 flex 行都得能换行，输入框不能把兄弟元素挤成 1ch 宽 */
+.dshpp-native-drill .rt-dock,
+.dshpp-native-drill .rt-dock * {
+  box-sizing: border-box;
+  min-width: 0;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.dshpp-native-drill .rt-dock input,
+.dshpp-native-drill .rt-dock textarea,
+.dshpp-native-drill .rt-dock select {
+  width: 100%;
+  max-width: 100%;
+}

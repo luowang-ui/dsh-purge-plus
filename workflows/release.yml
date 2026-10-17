@@ -1,0 +1,41 @@
+name: Community release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+concurrency:
+  group: community-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.repository == 'kingcharleslzy-ai/dsh-purge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/purge-panel/package-lock.json
+      - run: npm --prefix packages/purge-panel ci --ignore-scripts --legacy-peer-deps
+      - run: npm test && npm run check:client && npm run test:ui
+      - run: npm run check:docs
+      - run: npm pack --ignore-scripts && node scripts/smoke.mjs
+      - run: npm --prefix packages/purge-panel test
+      - name: Build verified release assets
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          test "$GITHUB_REF_NAME" = "v$version"
+          test "$(head -n 1 release-notes.md)" = "# $version"
+          test "$(node -p "require('./package.json').name")" = "dsh-purge-plus"
+          npm pack --ignore-scripts
+          sha256sum "dsh-purge-plus-$version.tgz" > SHA256SUMS.txt
+      - name: Publish community release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          gh release create "$GITHUB_REF_NAME" "dsh-purge-plus-$version.tgz" SHA256SUMS.txt --verify-tag --title "Purge Community $version" --notes-file release-notes.md

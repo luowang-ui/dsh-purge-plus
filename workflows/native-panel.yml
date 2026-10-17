@@ -1,0 +1,27 @@
+name: Native panel
+on:
+  push:
+    branches: [native-panel]
+    paths: ['packages/purge-panel/**', '.github/workflows/native-panel.yml']
+  pull_request:
+    paths: ['packages/purge-panel/**', '.github/workflows/native-panel.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/purge-panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/purge-panel/package-lock.json
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+      - run: npm run format:check
+      - run: npm test
+      - run: npm pack --ignore-scripts

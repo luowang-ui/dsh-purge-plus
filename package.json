@@ -1,0 +1,111 @@
+{
+  "name": "dsh-purge-plus",
+  "version": "1.6.1",
+  "description": "Purge Community Plus：DeepSeek Harness 破甲与提示词管理插件，适配 DSH Desktop 0.2.1-rc.x。相对 dsh-purge-community 1.6.0 额外修复：#119 宿主加载期 fatal load failure、presets 里残留 toolFilter 导致 redteam 预设注册失败。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": "./client.js",
+    "./redteam": "./lib/redteam/index.js",
+    "./redteam/store": "./lib/redteam/store.js",
+    "./redteam/ui": "./lib/redteam/ui.js",
+    "./redteam/tools": "./lib/redteam/tools.js",
+    "./package.json": "./package.json",
+    "./presets-plugin": "./lib/presets-plugin.js"
+  },
+  "bin": {
+    "dsh-purge": "bin/dsh-purge.js",
+    "purge-community": "bin/community.js"
+  },
+  "files": [
+    "lib",
+    "!lib/default-prompt-inject.md",
+    "bin",
+    "docs",
+    "presets",
+    "skills",
+    "scripts",
+    "client.js",
+    "cordis.patch.yml",
+    "screenshots.json",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "NOTICE.md",
+    "AGENTS.md"
+  ],
+  "scripts": {
+    "embed-prompt": "node scripts/embed-default-prompt.mjs",
+    "build:client": "node packages/purge-panel/scripts/build.mjs --community",
+    "test": "node --test test/community.test.mjs test/patch-anchors.test.mjs test/selfcheck.test.mjs test/boost.test.mjs test/prompt-sections.test.mjs test/presets.test.mjs test/anchors.test.mjs test/audit.test.mjs",
+    "test:ui": "node packages/purge-panel/test/community.cjs",
+    "check:client": "node packages/purge-panel/scripts/build.mjs --community --check",
+    "diagnose": "node bin/community.js diagnose",
+    "check:docs": "node scripts/check-docs.mjs",
+    "smoke": "npm pack --ignore-scripts && node scripts/smoke.mjs"
+  },
+  "license": "MIT",
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "prompt-management",
+    "rules",
+    "agent",
+    "backup",
+    "rollback",
+    "compatibility",
+    "purge-community",
+    "dsh-0.2.1",
+    "0.2.1-rc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luowang-ui/dsh-purge-plus.git"
+  },
+  "homepage": "https://github.com/luowang-ui/dsh-purge-plus#readme",
+  "bugs": {
+    "url": "https://github.com/luowang-ui/dsh-purge-plus/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-sidebar-right"
+      ]
+    },
+    "install": {
+      "preferred": "tarball",
+      "tarball": "https://github.com/luowang-ui/dsh-purge-plus/releases/latest/download/dsh-purge-plus-1.6.1.tgz",
+      "git": "https://github.com/luowang-ui/dsh-purge-plus.git"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=18",
+    "dsh": ">=0.2.1-rc.1"
+  },
+  "dshTarget": "DSH Desktop 0.2.1-rc.1 / 0.2.1-rc.2 verified (runtime prompt injection + host patch anchors). 0.2.0-rc.2 works for prompt injection but host patch anchors are unverified.",
+  "contributors": [
+    "小杨 / YuJunZhiXue (original dsh-purge author)",
+    "kingcharleslzy-ai (Purge Community fork author)",
+    "luowang-ui (0.2.1 compatibility fixes: #119, presets toolFilter)"
+  ]
+}

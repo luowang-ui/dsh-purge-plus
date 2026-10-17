@@ -310,14 +310,14 @@
         # 工具目录里摘掉，子智能体连看都看不到 subagent / subagent_fork / workflow / ralph。
         # maxDepth 同时收成 1 作为二道保险（默认 3 层太深，会白吃并发预算与上下文）。
         maxDepth: 1
-        # 注意：不能 deny `subagent` —— 它是这一行自己注册的 scoped 工具，不在全局工具库里，
-        # 写进 deny 会让 tools.restrict() 校验失败、整个委派路径报 "unknown global tool"（v0.8.0 踩过）。
-        # 子智能体拿不到 subagent_fork/workflow/ralph，加上 maxDepth: 1，实际已无派发能力。
-        toolFilter:
-          deny:
-            - subagent_fork
-            - workflow
-            - ralph
+        # DSH 0.2.1 起 `dsh-tool-subagent` 会直接拒绝 config 里的 `toolFilter` / `persona`：
+        #   tool-subagent: toolFilter is no longer supported; configure persona and tool
+        #   plugins in an Agent Preset and select it with agentPreset (spawn only)
+        # 所以旧版 deny 名单已不可用，已删除；叶子节点保障由上面的 maxDepth: 1 承担
+        # （子智能体无法再向下派发，subagent_fork / workflow / ralph 实际也用不起来）。
+        # 若要真正裁剪子会话的工具目录，给子智能体指定精简预设：
+        #   agentPreset: <preset-id>
+        # 需要时可配合 allowedAgentPresets 限定调用方能选的预设。
 
     # Fork omits model selection so provider/model stay equal to the parent and
     # the inherited history remains eligible for KV Cache reuse. This preset

@@ -24,6 +24,17 @@ DeepSeek Harness 的提示词、规则与技能管理 · 原生右侧面板 · �
 | `≤0.2.0-rc.1` | 不支持（上游 `1.1.71` 的 `{{cwd}}` 会每轮抛错导致收不到回复） |
 | 平台 | Windows 可用。`npm test` 有 7 个平台相关既有失败（POSIX launcher / backup / boost），与插件逻辑无关 |
 
+### 装完必须做的两件事
+
+1. **点面板上的「应用」** —— 写入宿主补丁（第 1 层）。DSH 官方更新后要重新点一次。
+2. **配置权限预设** —— 第 4 层不在插件里，而在 profile 配置里。不加的话界面仍会弹审批框。
+   把 [`docs/FIVE-LAYERS.md`](docs/FIVE-LAYERS.md) 里的 `permission` 段复制到
+   `$DSH_HOME/profiles/<profile>/cordis.patch.yml`，重启生效。
+
+> **破甲共有五层**：宿主补丁 / 提示词注入 / 破甲强化段 / 权限配置 / agent 预设。
+> 前四层所有会话共享，**预设只决定人设和工具表**——所以没选预设不代表没破甲。
+> 每层作用、验证方法与排查对照表见 **[docs/FIVE-LAYERS.md](docs/FIVE-LAYERS.md)**。
+
 ### 本版相对 `dsh-purge-community@1.6.0` 修了什么
 
 1. **#119 宿主加载期崩溃**

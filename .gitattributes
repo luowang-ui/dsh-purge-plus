@@ -1,0 +1,10 @@
+# 行尾约定：避免 Windows 上 core.autocrlf=true 把脚本改成 CRLF
+#
+# install.sh 一旦变成 CRLF，macOS/Linux 用户 `curl ... | sh` 会直接失败：
+#   sh: 1: $'\r': command not found
+#   /bin/sh^M: bad interpreter: No such file or directory
+
+*.sh  text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf

@@ -1,3 +1,12 @@
+# 1.6.1
+
+> 1.6.1 = 修掉 redteam 预设注册失败（`toolFilter` 残留）+ 补五层结构文档 + 重写安装说明。
+
+- **`toolFilter` 移除**：DSH 新版本已不支持 `toolFilter`，`presets/` 里的残留会让 `redteam` 预设注册失败，甚至触发宿主 fatal load failure（#119）。现在预设只声明人格与工具表，不再过滤。
+- **五层结构文档**：`docs/FIVE-LAYERS.md` 讲清宿主补丁 / 提示词注入 / 强化段 / 权限配置 / agent 预设各管什么、怎么验证、为什么「没选预设 ≠ 没破甲」。
+- **安装说明重写**（本次）：README 的 `curl | sh` 只对 macOS 成立，Windows 上必然失败（没有 `sh`，且 PowerShell 里 `curl` 是 `Invoke-WebRequest` 别名）。新增 `docs/INSTALL.md` 全平台手动步骤 + 按报错原文查的排查表；新增 `scripts/install.ps1` / `install.cmd` 供 Windows 使用；`install.sh` 改为走仓库归档 tarball（本仓库没有 GitHub Release，原 `releases/download/...` 链接全是 404），并在 Windows shell 下明确报错指向 `.ps1`。
+- **给 agent 的安装说明**：`docs/INSTALL-AGENT.md` 列全环境事实、作用域、验证与回滚，供 AI 执行安装时判断，要求先向用户确认风险再动手。
+
 # 1.6.0
 
 > 1.6.0 = 动作审计日志 + 发行包 smoke test（进 CI）+ 一轮全项目体检修复。

@@ -25,7 +25,7 @@ The script finds DSH Desktop, downloads the latest verified release, checks SHA2
 
 Then fully quit and reopen DSH, open **Purge** in the left rail, press **Apply**, and quit/reopen once more.
 
-**Current version 1.6.0 — qualified against DSH Desktop 0.2.1-rc.2 (and rc.1).**
+**Current version 1.6.1 — qualified against DSH Desktop 0.2.1-rc.2 (and rc.1).**
 
 ```
 purge-community selfcheck     # 27-layer proof that each bypass is live

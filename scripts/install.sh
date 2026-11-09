@@ -1,78 +1,113 @@
 #!/bin/sh
-# Purge Community installer — one line:
-#   curl -fsSL https://raw.githubusercontent.com/kingcharleslzy-ai/dsh-purge/master/scripts/install.sh | sh
+# Purge Community installer — macOS / Linux
 #
-# 做四件事：找到 DSH 桌面版 → 下载最新发行包 → 校验 SHA256 → 用 DSH 自带运行时跑安装器
-#（安装器会先备份 profile，再把旧 Purge 入口合并成 dsh-purge-plus）。
+#   curl -fsSL https://raw.githubusercontent.com/luowang-ui/dsh-purge-plus/main/scripts/install.sh | sh
+#
+# Windows 用户不要用本脚本（Windows 没有 sh）：
+#   下载仓库后双击 scripts\install.cmd，或跑 scripts\install.ps1
+#
+# 做五件事：找 DSH → 下载源码归档 → 校验结构 → 重打成本地 tgz → 用 DSH 自带运行时安装
+#（安装器会先备份 profile，再把旧 Purge 入口合并成 dsh-purge-plus）
 #
 # 可用环境变量：
-#   PURGE_VERSION=1.3.6     指定版本（默认取 latest）
+#   PURGE_REF=main                   分支或 tag（默认 main）
 #   DSH_APP="/Applications/DeepSeek Harness.app"   非默认安装路径
-#   DSH_HOME="$HOME/.dsh"   非默认数据目录
-# 参数：--dry-run 只下载校验，不安装；--version=X 同 PURGE_VERSION
+#   DSH_HOME="$HOME/.dsh"            非默认数据目录
+# 参数：
+#   --dry-run        只下载校验，不安装
+#   --ref=<name>     同 PURGE_REF
+#   -h, --help       显示这段说明
 set -eu
 
-REPO="kingcharleslzy-ai/dsh-purge"
-APP="${DSH_APP:-/Applications/DeepSeek Harness.app}"
-VERSION="${PURGE_VERSION:-}"
+REPO="luowang-ui/dsh-purge-plus"
+REF="${PURGE_REF:-main}"
 DRY=0
 
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY=1 ;;
-    --version=*) VERSION="${arg#*=}" ;;
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
-    *) echo "未知参数：$arg" >&2; exit 2 ;;
+    --ref=*) REF="${arg#*=}" ;;
+    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    *) printf '未知参数：%s\n' "$arg" >&2; exit 2 ;;
   esac
 done
 
 say() { printf '%s\n' "$*"; }
 die() { printf '✗ %s\n' "$*" >&2; exit 1; }
 
-[ "$(uname -s)" = "Darwin" ] || die "目前只支持 macOS（DSH Desktop）"
-[ -d "$APP" ] || die "找不到 $APP；用 DSH_APP=/path/to/DeepSeek Harness.app 指定"
-CLI="$APP/Contents/MacOS/DeepSeek Harness"
-[ -x "$CLI" ] || die "找不到可执行的 DSH 运行时：$CLI"
+# ---------- 平台分流 ----------
+OS="$(uname -s)"
+case "$OS" in
+  MINGW*|MSYS*|CYGWIN*)
+    die "这是 Windows（$OS），本脚本不适用。请用 scripts/install.cmd 或 scripts/install.ps1"
+    ;;
+  Darwin|Linux) : ;;
+  *) die "未验证的平台：$OS（本脚本支持 macOS / Linux）" ;;
+esac
+say "→ 平台：$OS"
 
-if [ -z "$VERSION" ]; then
-  say "→ 查询最新发行版…"
-  VERSION=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null \
-    | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\{0,1\}\([^"]*\)".*/\1/p' \
-    | head -n 1) || true
-  [ -n "$VERSION" ] || die "读不到最新版本号（GitHub API 不可用），可改用 --version=1.3.6"
+# ---------- 找 DSH ----------
+if [ "$OS" = "Darwin" ]; then
+  APP="${DSH_APP:-/Applications/DeepSeek Harness.app}"
+  CLI="$APP/Contents/MacOS/DeepSeek Harness"
+else
+  APP="${DSH_APP:-}"
+  CLI=""
+  if [ -n "$APP" ] && [ -x "$APP/DeepSeek Harness" ]; then
+    CLI="$APP/DeepSeek Harness"
+  else
+    die "Linux 上请用 DSH_APP=/path/to/resources/app 指定安装目录（内含 DeepSeek Harness 可执行文件）"
+  fi
 fi
-say "→ 目标版本：$VERSION"
+[ -x "$CLI" ] || die "找不到可执行的 DSH 运行时：$CLI（用 DSH_APP=... 指定）"
+say "→ DSH：$CLI"
 
+HOMEDIR="${DSH_HOME:-$HOME/.dsh}"
+[ -d "$HOMEDIR" ] || die "找不到 DSH 数据目录 $HOMEDIR —— 请先安装并至少启动一次 DSH"
+say "→ DSH_HOME：$HOMEDIR"
+
+# ---------- 下载源码归档 ----------
+# 注意：本仓库没有 GitHub Release，只能用 archive tarball。
+URL="https://github.com/$REPO/archive/refs/heads/$REF.tar.gz"
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/purge-install.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
-TGZ="dsh-purge-plus-$VERSION.tgz"
-BASE="https://github.com/$REPO/releases/download/v$VERSION"
 
-say "→ 下载 $TGZ"
-curl -fsSL "$BASE/$TGZ" -o "$TMP/$TGZ" || die "下载失败：$BASE/$TGZ"
-curl -fsSL "$BASE/SHA256SUMS.txt" -o "$TMP/SHA256SUMS.txt" || die "下载 SHA256SUMS 失败"
+say "→ 下载 $URL"
+curl -fsSL "$URL" -o "$TMP/src.tar.gz" || die "下载失败：$URL
+  · 无法访问 GitHub：手动下载后解压，改用 docs/INSTALL.md 的手动安装
+  · 或者换一个 ref：--ref=<tag>"
 
-say "→ 校验 SHA256"
-( cd "$TMP" && shasum -a 256 -c SHA256SUMS.txt >/dev/null 2>&1 ) || die "校验失败，未安装"
+mkdir -p "$TMP/x"
+tar -xzf "$TMP/src.tar.gz" -C "$TMP/x" || die "解压失败"
+SRC=$(find "$TMP/x" -maxdepth 1 -mindepth 1 -type d | head -n 1)
+[ -n "$SRC" ] || die "归档里没有目录"
+
+# ---------- 校验结构（归档必须带已构建的 lib/） ----------
+for f in package.json lib/index.js lib/core.js cordis.patch.yml bin/community.js; do
+  [ -f "$SRC/$f" ] || die "源码不完整，缺少 $f —— 该 ref 可能没有提交构建产物，换 main 或发版 tag"
+done
+VERSION=$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$SRC/package.json" | head -n 1)
+say "→ 版本：$VERSION"
 
 if [ "$DRY" = "1" ]; then
-  say "✓ 校验通过（--dry-run，未安装）：$TMP/$TGZ"
+  say "✓ 校验通过（--dry-run，未安装）：$SRC"
   exit 0
 fi
 
-mkdir -p "$TMP/x"
-tar -xzf "$TMP/$TGZ" -C "$TMP/x"
-INSTALLER="$TMP/x/package/bin/community.js"
-[ -f "$INSTALLER" ] || die "发行包里没有安装器：$INSTALLER"
+# ---------- 重打成 npm pack 形态（package/ 前缀），交给插件自己的安装器 ----------
+mkdir -p "$TMP/pack"
+cp -R "$SRC" "$TMP/pack/package"
+TGZ="$TMP/dsh-purge-plus-$VERSION.tgz"
+tar -czf "$TGZ" -C "$TMP/pack" package || die "打包失败"
 
-say "→ 调用 DSH 自带运行时安装（会先备份 profile）"
-ELECTRON_RUN_AS_NODE=1 "$CLI" "$INSTALLER" migrate "$TMP/$TGZ" || die "安装器返回失败"
+say "→ 调用插件安装器（会先备份 profile）"
+DSH_HOME="$HOMEDIR" ELECTRON_RUN_AS_NODE=1 "$CLI" "$SRC/bin/community.js" migrate "$TGZ" \
+  || die "安装器返回失败；可改用 docs/INSTALL.md 的手动方式"
 
 say ""
 say "✓ 已安装 Purge Community $VERSION"
 
-# 顺手跑一次自检并把摘要打出来：装完就知道"能跑、补丁几层在位"，不用再记第二条命令。
-HOMEDIR="${DSH_HOME:-$HOME/.dsh}"
+# ---------- 顺手自检 ----------
 SUMMARY=""
 for cli in "$HOMEDIR"/profiles/*/node_modules/dsh-purge-plus/bin/community.js; do
   [ -f "$cli" ] || continue
@@ -84,11 +119,11 @@ if [ -n "$SUMMARY" ]; then
   say "自检摘要："
   printf '%s\n' "$SUMMARY" | sed 's/^/  /'
 else
-  say "  （自检未运行：装好后到面板里点「应用」，或手动跑 purge-community selfcheck）"
+  say "  （自检未运行：装好后到面板点「应用」，或手动跑 purge-community selfcheck）"
 fi
 
 say ""
 say "接下来："
 say "  1) 完全退出并重开 DSH"
-say "  2) 左侧栏点 Purge → 状态页顶部点「应用」写入宿主补丁"
+say "  2) 左侧栏 → Purge → 状态页顶部点「应用」"
 say "  3) 再退出重开一次，然后跑：purge-community selfcheck"

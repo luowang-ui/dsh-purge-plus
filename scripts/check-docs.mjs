@@ -17,7 +17,10 @@ if (notesFirst !== `# ${version}`) {
 if (!readme.includes(`**${version}**`)) {
   problems.push(`README.md 首屏缺少版本号 **${version}**`);
 }
-if (!readme.includes("raw.githubusercontent.com/kingcharleslzy-ai/dsh-purge/master/scripts/install.sh")) {
+// 一行安装命令：接受本仓库（luowang-ui/dsh-purge-plus）与上游（kingcharleslzy-ai/dsh-purge）。
+// 原实现硬编码上游仓库名，导致 README 只要指向本仓库就会被判失败。
+const installLine = /raw\.githubusercontent\.com\/[^\s/]+\/(dsh-purge-plus|dsh-purge)\/(main|master)\/scripts\/install\.sh/;
+if (!installLine.test(readme)) {
   problems.push("README.md 缺少一行安装命令");
 }
 if (!readmeEn.includes(`Current version ${version}`)) {

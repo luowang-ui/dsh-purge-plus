@@ -9,33 +9,46 @@
 [![Release](https://img.shields.io/github/v/release/luowang-ui/dsh-purge-plus?label=release)](https://github.com/luowang-ui/dsh-purge-plus/releases)
 [![Checks](https://github.com/luowang-ui/dsh-purge-plus/actions/workflows/community.yml/badge.svg)](https://github.com/luowang-ui/dsh-purge-plus/actions/workflows/community.yml)
 
-当前版本 **1.6.0** · 适配 **DSH Desktop 0.2.1-rc.2**（rc.1 同样通过） · [English](docs/README.en.md)
+当前版本 **1.6.1** · 适配 **DSH Desktop 0.2.1-rc.2**（rc.1 同样通过） · [English](docs/README.en.md)
 
 </div>
 
 ---
 
-## 一行安装
+## 安装
+
+**先选平台**，别再复制那句 `curl | sh` —— 它只对 macOS 成立。
+
+| 你的系统 | 怎么装 |
+|---|---|
+| **Windows** | 下载仓库 → 双击 `scripts\install.cmd`（或跑 `install.ps1`） |
+| **macOS** | 见下方一行命令，或 [安装说明 §4](docs/INSTALL.md#4-macos-手动安装) |
+| **离线 / 内网** | `install.ps1 -Tarball D:\purge.tar.gz`，见 [安装说明 §5](docs/INSTALL.md#5-离线--内网安装) |
+
+**macOS / Linux**（需要 `sh`，Windows 不要用）：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/luowang-ui/dsh-purge-plus/master/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/luowang-ui/dsh-purge-plus/main/scripts/install.sh | sh
 ```
 
-它会自动：找 DSH 桌面版 → 下载最新发行包 → 校验 SHA256 → 用 DSH 自带运行时跑安装器（**先备份 profile**，再把旧的 Purge 入口合并成一个）。
+它会：找 DSH → 下载仓库归档 → 校验结构 → 用 DSH 自带运行时安装（**先备份 profile**）。
 
-然后 **完全退出并重开 DSH** → 左侧栏点 **Purge** → 状态页顶部点 **应用** → 再退出重开一次。完事。
+**完整手动步骤（四个平台的环境差异、逐个报错的解法）**：[`docs/INSTALL.md`](docs/INSTALL.md)
+**让 AI 帮你装**：[`docs/INSTALL-AGENT.md`](docs/INSTALL-AGENT.md)（给 agent 的事实清单，不是话术）
+
+装完三步：**完全退出并重开 DSH** → 左侧栏 **Purge** → 状态页顶部点 **应用** → 再退出重开一次。
 
 <details>
-<summary>不想用脚本？手动三步</summary>
+<summary>为什么 Windows 上 <code>curl | sh</code> 一定失败</summary>
 
-```sh
-V=1.6.0
-curl -fsSLO https://github.com/luowang-ui/dsh-purge-plus/releases/download/v$V/dsh-purge-plus-$V.tgz
-curl -fsSLO https://github.com/luowang-ui/dsh-purge-plus/releases/download/v$V/SHA256SUMS.txt
-shasum -a 256 -c SHA256SUMS.txt && mkdir -p /tmp/pc && tar -xzf dsh-purge-plus-$V.tgz -C /tmp/pc
-ELECTRON_RUN_AS_NODE=1 "/Applications/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness" \
-  /tmp/pc/package/bin/community.js migrate "$PWD/dsh-purge-plus-$V.tgz"
-```
+| 现象 | 原因 |
+|---|---|
+| `'sh' 不是内部或外部命令` | Windows 没有 `sh` |
+| `curl : 无法将"curl"项识别为 cmdlet` | PowerShell 5.1 把 `curl` 当 `Invoke-WebRequest` 的别名，参数不兼容；要写 `curl.exe` |
+| `releases/download/...` 404 | 本仓库**没有发布 GitHub Release**，只能走 archive tarball |
+| `profile "desktop" is managed exclusively by the Electron application` | 桌面 profile 由 Electron 独占，`dsh plugin add` 用不了，必须改 `package.json` |
+
+这四条都在 [`docs/INSTALL.md`](docs/INSTALL.md) 的故障排查表里。
 </details>
 
 ## 为什么用它，而不是原版
